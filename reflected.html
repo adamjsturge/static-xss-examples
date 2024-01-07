@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reflected XSS</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="reflected.html">Reflected</a></li>
+            <li><a href="stored.html">Stored</a></li>
+        </ul>
+    </nav>
+    <h1>Reflected XSS</h1>
+
+    <h3 id="intro">Hello new user!</h3>
+
+    <p>Enter your name:</p>
+    <input id="name" type="text" name="name" value="">
+    <input id="submit" type="submit" value="Submit">
+
+    <h4>How to do it</h4>
+    <p>
+        Try entering <code>&lt;script&gt;alert(1)&lt;/script&gt;</code> as your name. (it won't work!)
+        <br>
+        .innerHTML no longer runs <code>&lt;script&gt;</code> tags but you can use another payload <code>&lt;img src='x' onerror='alert(1)'&gt;</code>
+    </p>
+    <p></p>
+    <h4>How is it different</h4>
+    <p>Why is this different from stored? This one uses the URL to load the payload. This URL on any browser will trigger the XSS</p>
+    <h4>Real world examples</h4>
+    <p>Pretty much similiar to this example from article names or other things.</p>
+
+    For more go to <a href="https://portswigger.net/web-security/cross-site-scripting/reflected">Portswigger</a>
+</body>
+    <script>
+        document.getElementById("submit").addEventListener("click", function() {
+            smart_set_url();
+        });
+        function smart_set_url(){
+            var name = document.getElementById("name").value;
+            var current_url = window.location.href;
+            var safe_current_url = current_url.split("?")[0];
+            var url = safe_current_url + "?name=" + name;        
+            window.location.href = url;
+        }
+
+        function get_name_from_url() {
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            return urlParams.get('name');
+        }
+        function set_name() {
+            var name = get_name_from_url();
+            if (name) {
+                document.getElementById("intro").innerHTML = "Hello " + name;
+            }
+        }
+        set_name();
+    </script>
+</html>
